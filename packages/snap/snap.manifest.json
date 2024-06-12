@@ -1,27 +1,24 @@
 {
   "version": "0.1.0",
-  "description": "An example Snap written in TypeScript.",
-  "proposedName": "TypeScript Example",
+  "description": "Welcome to the casino.",
+  "proposedName": "Slots",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MetaMask/template-snap-monorepo.git"
+    "url": "https://github.com/Montoya/slots-snap.git"
   },
   "source": {
-    "shasum": "TwVBeJ/PL4uARBEFZmgJukYd3XWyTbilkOPhtdg+GvU=",
+    "shasum": "DEwJgO0f1N86d+jjVHEllZey9W2gTePAswrtGqcuB8E=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
-        "packageName": "snap",
+        "iconPath": "images/icon.svg",
+        "packageName": "slots-snap",
         "registry": "https://registry.npmjs.org/"
       }
     }
   },
   "initialPermissions": {
-    "snap_dialog": {},
-    "endowment:rpc": {
-      "dapps": true,
-      "snaps": false
-    }
+    "endowment:page-home": {}
   },
   "manifestVersion": "0.1"
 }
