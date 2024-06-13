@@ -11,13 +11,13 @@ const svgArr = [
 ];
 
 const svgStaticArr = [
-  `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200"><style>.emoji{text-anchor:middle;dominant-baseline:middle;font-size:80px}</style><defs><linearGradient id="a" x1="0" y1="0" x2="0" y2="200" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#818181"/><stop offset=".24" stop-color="#b8b8b8"/><stop offset=".51" stop-color="#f3f3f3"/><stop offset=".86" stop-color="#b4b4b4"/><stop offset="1" stop-color="#666"/></linearGradient><filter id="c" x="-50%" y="-50%" width="200%" height="200%"><feComponentTransfer in="SourceAlpha"><feFuncA type="table" tableValues="1 0"/></feComponentTransfer><feGaussianBlur stdDeviation="4"/><feOffset dy="5" result="offsetblur"/><feFlood flood-color="#000" result="color"/><feComposite in2="offsetblur" operator="in"/><feComposite in2="SourceAlpha" operator="in"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode/></feMerge></filter></defs><path fill="url(#a)" style="box-shadow:0 0 112px 168px inset rgba(0,0,0,.8)" d="M0 0h400v200H0z"/><path fill="#fff" filter="url(#c)" d="M16 16h112v168H16zm128 0h112v168H144zm128 0h112v168H272z"/><text x="72" y="112" class="emoji">`,
-  `</text><text x="200" y="112" class="emoji">`,
-  `</text><text x="328" y="112" class="emoji">`,
+  `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200"><style>.emoji{text-anchor:middle;dominant-baseline:middle;font-size:80px}</style><defs><linearGradient id="a" x1="0" y1="0" x2="0" y2="200" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#818181"/><stop offset=".24" stop-color="#b8b8b8"/><stop offset=".51" stop-color="#f3f3f3"/><stop offset=".86" stop-color="#b4b4b4"/><stop offset="1" stop-color="#666"/></linearGradient><filter id="c" x="-50%" y="-50%" width="200%" height="200%"><feComponentTransfer in="SourceAlpha"><feFuncA type="table" tableValues="1 0"/></feComponentTransfer><feGaussianBlur stdDeviation="4"/><feOffset dy="5" result="offsetblur"/><feFlood flood-color="#000" result="color"/><feComposite in2="offsetblur" operator="in"/><feComposite in2="SourceAlpha" operator="in"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode/></feMerge></filter></defs><path fill="url(#a)" style="box-shadow:0 0 112px 168px inset rgba(0,0,0,.8)" d="M0 0h400v200H0z"/><path fill="#fff" filter="url(#c)" d="M16 16h112v168H16zm128 0h112v168H144zm128 0h112v168H272z"/><text x="72" y="114" class="emoji">`,
+  `</text><text x="200" y="114" class="emoji">`,
+  `</text><text x="328" y="114" class="emoji">`,
   `</text></svg>`
 ]
 
-const reel = ['🦊','🍒','🍊','🍌','🍌','🍎','🍎']; 
+let reel = ['🦊','🍒','🍊','🍌','🍌','🍎','🍎']; 
 
 const getRandom = () => { 
   
@@ -45,7 +45,7 @@ export const onHomePage: OnHomePageHandler = async () => {
   const playerState = await snap.request({
     method: "snap_manageState",
     params: { operation: "get" },
-  })  || { balance: 1000, new: true, lastBet: 0, lastResult: [reel[0],reel[0],reel[0]] };
+  })  || { balance: 1000, new: true, lastBet: 0, lastResult: [reel[0],reel[0],reel[0]], reel: "fox" };
   const interfaceId = await snap.request({
     method: "snap_createInterface",
     params: {
@@ -66,7 +66,17 @@ export const onUserInput: OnUserInputHandler = async ({id, event}) => {
   const playerState = await snap.request({
     method: "snap_manageState",
     params: { operation: "get" },
-  }) || { balance: 1000, new: true, lastBet: 0, lastResult: [reel[0],reel[0],reel[0]] };
+  }) || { balance: 1000, new: true, lastBet: 0, lastResult: [reel[0],reel[0],reel[0]], reel: "fox" };
+
+  switch(playerState.reel) { 
+    case 'gator': 
+      reel = ['🦊','🍒','🍊','🍌','🍌','🍎','🍎']; 
+      break; 
+    case 'fox': 
+    default: 
+      reel = ['🦊','🍒','🍊','🍌','🍌','🍎','🍎']; 
+      break; 
+  }
 
   switch (event.name) { 
     case "new": 
@@ -102,10 +112,11 @@ export const onUserInput: OnUserInputHandler = async ({id, event}) => {
             <Box>
               <StaticSlot one={playerState.lastResult[0]} two={playerState.lastResult[1]} three={playerState.lastResult[2]}/>
               <Row label="Balance"><Text>{"$"+playerState.balance}</Text></Row>
-              <Box direction="horizontal" alignment="space-around">
+              <Box direction="horizontal" alignment="space-between">
                 <Button name="bet5">Bet 5</Button>
                 <Button name="bet10">Bet 10</Button>
                 <Button name="bet25">Bet 25</Button>
+                <Button name="settings">⚙️</Button>
               </Box>
             </Box>
           )
@@ -181,10 +192,11 @@ export const onUserInput: OnUserInputHandler = async ({id, event}) => {
                   <StaticSlot one={playerState.lastResult[0]} two={playerState.lastResult[1]} three={playerState.lastResult[2]}/>
                   <Row label="Balance"><Text>{"$"+playerState.balance}</Text></Row>
                   <Text><Italic>{win?"You won $"+win+"!":"Try again..."}</Italic></Text>
-                  <Box direction="horizontal" alignment="space-around">
+                  <Box direction="horizontal" alignment="space-between">
                     <Button name="bet5">Bet 5</Button>
                     <Button name="bet10">Bet 10</Button>
                     <Button name="bet25">Bet 25</Button>
+                    <Button name="settings">⚙️</Button>
                   </Box>
                 </Box>
               )
@@ -194,6 +206,20 @@ export const onUserInput: OnUserInputHandler = async ({id, event}) => {
         }, 5000); 
       }); 
       return prom; 
+      break; 
+    case 'settings': 
+      await snap.request({
+        method: "snap_updateInterface",
+        params: { 
+          id, 
+          ui: ( 
+            <Box>
+              <Text>Settings go here...</Text>
+              <Button name="start">Save</Button>
+            </Box>
+          ),
+        },
+      }); 
       break; 
   }
 }; 
