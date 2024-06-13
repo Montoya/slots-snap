@@ -7,7 +7,7 @@
     "url": "https://github.com/Montoya/slots-snap.git"
   },
   "source": {
-    "shasum": "1s4OpwU26OCravJiI6gH7c32e2qC3W68ubxZcaZD0H0=",
+    "shasum": "4EttXDcV2A7SB5GJyRLBdpccBmPDrQit4J4j0FJvsL0=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -19,7 +19,9 @@
   },
   "initialPermissions": {
     "endowment:page-home": {},
-    "snap_manageState": {}
+    "snap_manageState": {},
+    "endowment:lifecycle-hooks": {},
+    "snap_dialog": {}
   },
   "manifestVersion": "0.1"
 }
