@@ -1,5 +1,5 @@
-import type { OnHomePageHandler, OnUserInputHandler, OnInstallHandler } from "@metamask/snaps-sdk";
-import { SnapComponent, Box, Button, Image, Heading, Text, Italic, Row } from '@metamask/snaps-sdk/jsx';
+import { type OnHomePageHandler, type OnUserInputHandler, type OnInstallHandler, UserInputEventType } from "@metamask/snaps-sdk";
+import { SnapComponent, Box, Button, Image, Heading, Text, Italic, Row, Form, Dropdown, Option, Field } from '@metamask/snaps-sdk/jsx';
 
 const svgTitle = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200"><style>.sign{text-anchor:middle;dominant-baseline:middle;font-size:64px;font-weight:bold}</style><defs><linearGradient id="a" x1="0" y1="0" x2="0" y2="200" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#818181"/><stop offset=".24" stop-color="#b8b8b8"/><stop offset=".51" stop-color="#f3f3f3"/><stop offset=".86" stop-color="#b4b4b4"/><stop offset="1" stop-color="#666"/></linearGradient><filter id="c" x="-50%" y="-50%" width="200%" height="200%"><feComponentTransfer in="SourceAlpha"><feFuncA type="table" tableValues="1 0"/></feComponentTransfer><feGaussianBlur stdDeviation="4"/><feOffset dy="5" result="offsetblur"/><feFlood flood-color="#000" result="color"/><feComposite in2="offsetblur" operator="in"/><feComposite in2="SourceAlpha" operator="in"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode/></feMerge></filter><filter id="g" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="8 8" result="glow"/><feMerge><feMergeNode in="glow"/><feMergeNode in="glow"/><feMergeNode in="glow"/></feMerge></filter></defs><path fill="url(#a)" style="box-shadow:0 0 112px 168px inset rgba(0,0,0,.8)" d="M0 0h400v200H0z"/><rect fill="#334" filter="url(#c)" x="16" y="16" width="368" height="168"/><text x="200" y="62" class="sign" style="font-size:24px;font-weight:normal;font-family:'Comic Sans MS','Comic Sans',Charcoal,cursive" fill="white">Let's play...</text><text x="200" y="124" class="sign" fill="#ff8c00" filter="url(#g)">Slots</text><text x="200" y="124" class="sign" fill="white">Slots</text></svg>`; 
 
@@ -68,9 +68,27 @@ export const onUserInput: OnUserInputHandler = async ({id, event}) => {
     params: { operation: "get" },
   }) || { balance: 1000, new: true, lastBet: 0, lastResult: [reel[0],reel[0],reel[0]], reel: "fox" };
 
+  if(event.name=="settings-form" && event.type==UserInputEventType.FormSubmitEvent) { 
+    playerState.reel = ''+event.value.reel; 
+    await snap.request({
+      method: "snap_manageState",
+      params: { 
+        operation: "update",
+        newState: playerState,
+      },
+    });
+    event.name = "start"; 
+  }
+
   switch(playerState.reel) { 
     case 'gator': 
-      reel = ['🦊','🍒','🍊','🍌','🍌','🍎','🍎']; 
+      reel = ['🐊','🐘','🦒','🐅','🐅','🦓','🦓']; 
+      break; 
+    case 'frog': 
+      reel = ['🐸','🍱','🍵','🍥','🍥','🍄','🍄']; 
+      break; 
+    case 'gem': 
+      reel = ['💎','👑','💰','👠','👠','🛍️','🛍️']; 
       break; 
     case 'fox': 
     default: 
@@ -214,8 +232,18 @@ export const onUserInput: OnUserInputHandler = async ({id, event}) => {
           id, 
           ui: ( 
             <Box>
-              <Text>Settings go here...</Text>
-              <Button name="start">Save</Button>
+              <Heading>Settings</Heading>
+              <Form name="settings-form">
+                <Field label="Theme">
+                  <Dropdown name="reel">
+                    <Option value="fox">🦊 🍒 🍊 🍌 🍎</Option>
+                    <Option value="gator">🐊 🐘 🦒 🐅 🦓</Option>
+                    <Option value="frog">🐸 🍱 🍵 🍥 🍄</Option>
+                    <Option value="gem">💎 👑 💰 👠 🛍️</Option>
+                  </Dropdown>
+                </Field>
+                <Button name="save">Save</Button>
+              </Form>
             </Box>
           ),
         },
