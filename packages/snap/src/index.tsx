@@ -268,7 +268,7 @@ export const onUserInput: OnUserInputHandler = async ({id, event}) => {
               <Heading>Settings</Heading>
               <Form name="settingsForm">
                 <Field label="Theme">
-                  <Dropdown name="reel">
+                  <Dropdown name="reel" value={''+playerState.reel}>
                     <Option value="fox">🦊 🍒 🍊 🍌 🍎</Option>
                     <Option value="gator">🐊 🐘 🦒 🐅 🦓</Option>
                     <Option value="frog">🐸 🍱 🍵 🍥 🍄</Option>
@@ -297,7 +297,7 @@ export const onUserInput: OnUserInputHandler = async ({id, event}) => {
           ui: ( 
             <Box>
               <Heading>Are you sure?</Heading>
-              <Text>This will erase your data. This cannot be undone.</Text>
+              <Text>This will erase your game data. This cannot be undone.</Text>
               <Box direction="horizontal" alignment="space-between">
                 <Button name="settings">Cancel</Button>
                 <Button name="clear" variant="destructive">Confirm</Button>
