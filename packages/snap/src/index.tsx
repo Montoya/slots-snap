@@ -19,10 +19,6 @@ const svgStaticArr = [
 
 let reel = ['🦊','🍒','🍊','🍌','🍌','🍎','🍎']; 
 
-const getRandom = () => { 
-  
-}
-
 type SlotProps = { 
   one: string;
   two: string;
