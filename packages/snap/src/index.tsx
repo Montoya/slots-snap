@@ -41,7 +41,9 @@ export const onHomePage: OnHomePageHandler = async () => {
   const playerState = await snap.request({
     method: "snap_manageState",
     params: { operation: "get" },
-  })  || { balance: 1000, new: true, lastBet: 0, lastResult: [reel[0],reel[0],reel[0]], reel: "fox" };
+  })  || { balance: 1000, new: true, lastBet: 0, lastResult: [reel[0],reel[0],reel[0]], reel: "fox", stats: { 
+    spins: 0, restarts:0, high: 1000, triples: 0
+  } };
   const interfaceId = await snap.request({
     method: "snap_createInterface",
     params: {
@@ -60,18 +62,21 @@ export const onHomePage: OnHomePageHandler = async () => {
 
 export const onUserInput: OnUserInputHandler = async ({id, event}) => { 
 
-  if(event.name=="clear") { 
-    await snap.request({ 
-      method: "snap_manageState",
-      params: { operation: "clear" },
-    }); 
-    event.name = "startFresh"; 
-  }
-
   const playerState = await snap.request({
     method: "snap_manageState",
     params: { operation: "get" },
-  }) || { balance: 1000, new: true, lastBet: 0, lastResult: [reel[0],reel[0],reel[0]], reel: "fox" };
+  }) || { balance: 1000, new: true, lastBet: 0, lastResult: [reel[0],reel[0],reel[0]], reel: "fox", stats: { 
+    spins: 0, restarts:0, high: 1000, triples: 0, bet5s: 0, bet10s: 0, bet25s: 0
+  } };
+
+  if(event.name=="startOver") { 
+    playerState.balance = 1000; 
+    playerState.new = true; 
+    playerState.lastBet = 0; 
+    playerState.lastResult = [reel[0],reel[0],reel[0]]; 
+    playerState.stats.restarts += 1;  
+    event.name = "startFresh"; 
+  }
 
   if(event.name=="settingsForm" && event.type==UserInputEventType.FormSubmitEvent) { 
     playerState.reel = ''+event.value.reel; 
@@ -121,10 +126,6 @@ export const onUserInput: OnUserInputHandler = async ({id, event}) => {
         }
       }); 
       break;
-    case "startOver": 
-      playerState.balance = 1000; 
-      playerState.lastBet = 0;
-      playerState.lastResult = [reel[0],reel[0],reel[0]]; 
     case "startFresh": 
       playerState.new = false; 
       await snap.request({
@@ -165,6 +166,8 @@ export const onUserInput: OnUserInputHandler = async ({id, event}) => {
     case "bet5": 
     case "bet10": 
     case "bet25": 
+      playerState.stats.spins += 1; 
+      playerState.stats[event.name+'s'] += 1; 
       playerState.lastBet = parseInt(event.name.substring(3)); 
       playerState.balance -= playerState.lastBet; 
       const valuesArray = new Uint32Array(3);
@@ -191,6 +194,7 @@ export const onUserInput: OnUserInputHandler = async ({id, event}) => {
             win = playerState.lastBet * 2; 
             break; 
         }
+        playerState.stats.triples += 1; 
       } else if(one==reel[0] && one==two || two==reel[0] && two==three || three==reel[0] && one==three) { 
         win = playerState.lastBet * 8; 
       }
@@ -213,6 +217,9 @@ export const onUserInput: OnUserInputHandler = async ({id, event}) => {
         },
       }); 
       playerState.balance += win; 
+      if(playerState.stats.high < playerState.balance) { 
+        playerState.stats.high = playerState.balance; 
+      }
       await snap.request({
         method: "snap_manageState",
         params: { 
@@ -275,10 +282,17 @@ export const onUserInput: OnUserInputHandler = async ({id, event}) => {
                 <Button name="start">Cancel</Button>
               </Form>
               <Divider/>
-              <Text> </Text>
-              <Text> </Text>
-              <Text> </Text>
-              <Text> </Text>
+              <Box>
+                <Heading>Stats</Heading>
+                <Row label="High score"><Text>{"$"+playerState.stats.high}</Text></Row>
+                <Row label="Spins"><Text>{''+playerState.stats.spins}</Text></Row>
+                <Row label="Bet 5s"><Text>{''+playerState.stats.bet5s}</Text></Row>
+                <Row label="Bet 10s"><Text>{''+playerState.stats.bet10s}</Text></Row>
+                <Row label="Bet 25s"><Text>{''+playerState.stats.bet25s}</Text></Row>
+                <Row label="Triple matches"><Text>{''+playerState.stats.triples}</Text></Row>
+                <Row label="Restarts"><Text>{''+playerState.stats.restarts}</Text></Row>
+              </Box>
+              <Divider/>
               <Button name="attemptClear" variant="destructive">Reset</Button>
             </Box>
           ),
@@ -293,10 +307,10 @@ export const onUserInput: OnUserInputHandler = async ({id, event}) => {
           ui: ( 
             <Box>
               <Heading>Are you sure?</Heading>
-              <Text>This will erase your game data. This cannot be undone.</Text>
+              <Text>This will set your balance back to $1000. You will not lose your stats.</Text>
               <Box direction="horizontal" alignment="space-between">
                 <Button name="settings">Cancel</Button>
-                <Button name="clear" variant="destructive">Confirm</Button>
+                <Button name="startOver" variant="destructive">Confirm</Button>
               </Box>
             </Box>
           ),
