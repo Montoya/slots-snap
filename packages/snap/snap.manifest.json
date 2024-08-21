@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Welcome to the casino.",
   "proposedName": "Slots",
   "repository": {
@@ -7,7 +7,7 @@
     "url": "https://github.com/Montoya/slots-snap.git"
   },
   "source": {
-    "shasum": "DC4TOAGG3PD/f7nlb+oaIBNDKyr8ZZfgsyoJE710Bvg=",
+    "shasum": "RVDHChwUUnn5g2hW/X6MXoLUY8M2bjixDIuqXb9Iqpo=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
